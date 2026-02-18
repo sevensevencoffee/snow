@@ -214,7 +214,7 @@
 
   <div class="presets">
     <span>Presets:</span>
-    <button class="preset-btn" data-preset="star" title="Star">&#10052;</button>
+    <button class="preset-btn" data-preset="snowflake" title="Snowflake">&#10052;</button>
     <button class="preset-btn" data-preset="heart" title="Heart">&#9829;</button>
     <button class="preset-btn" data-preset="circle" title="Circle">&#9679;</button>
     <button class="preset-btn" data-preset="diamond" title="Diamond">&#9830;</button>
@@ -301,7 +301,7 @@
       drawCtx.strokeStyle = '#ffffff';
 
       const preset = btn.dataset.preset;
-      if (preset === 'star') drawStar(cx, cy, 5, 50, 22);
+      if (preset === 'snowflake') drawSnowflake(cx, cy, 90);
       else if (preset === 'heart') drawHeart(cx, cy, 45);
       else if (preset === 'circle') {
         drawCtx.beginPath(); drawCtx.arc(cx, cy, 45, 0, Math.PI * 2); drawCtx.fill();
@@ -337,6 +337,40 @@
     drawCtx.moveTo(cx, cy + size * 0.7);
     drawCtx.bezierCurveTo(cx - size * 1.2, cy - size * 0.2, cx - size * 0.6, cy - size, cx, cy - size * 0.4);
     drawCtx.bezierCurveTo(cx + size * 0.6, cy - size, cx + size * 1.2, cy - size * 0.2, cx, cy + size * 0.7);
+    drawCtx.fill();
+  }
+
+  function drawSnowflake(cx, cy, radius) {
+    drawCtx.lineWidth = 4;
+    drawCtx.lineCap = 'round';
+    const arms = 6;
+    const branchFractions = [0.35, 0.6, 0.8];
+    for (let i = 0; i < arms; i++) {
+      const angle = (Math.PI * 2 * i) / arms - Math.PI / 2;
+      const ax = cx + Math.cos(angle) * radius;
+      const ay = cy + Math.sin(angle) * radius;
+      // Main arm
+      drawCtx.beginPath();
+      drawCtx.moveTo(cx, cy);
+      drawCtx.lineTo(ax, ay);
+      drawCtx.stroke();
+      // Branches
+      for (const t of branchFractions) {
+        const bx = cx + Math.cos(angle) * radius * t;
+        const by = cy + Math.sin(angle) * radius * t;
+        const bLen = radius * 0.28 * (1 - t * 0.5);
+        for (const side of [-1, 1]) {
+          const ba = angle + side * Math.PI / 3;
+          drawCtx.beginPath();
+          drawCtx.moveTo(bx, by);
+          drawCtx.lineTo(bx + Math.cos(ba) * bLen, by + Math.sin(ba) * bLen);
+          drawCtx.stroke();
+        }
+      }
+    }
+    // Center dot
+    drawCtx.beginPath();
+    drawCtx.arc(cx, cy, 5, 0, Math.PI * 2);
     drawCtx.fill();
   }
 
