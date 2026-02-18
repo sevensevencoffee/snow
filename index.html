@@ -144,6 +144,29 @@
     transform: scale(1.08);
   }
 
+  /* Upload PNG button */
+  .upload-btn {
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px dashed rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .upload-btn:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.5);
+    transform: scale(1.04);
+  }
+
   /* --- Snow Canvas (fullscreen) --- */
   #snow-canvas {
     position: fixed;
@@ -195,6 +218,8 @@
     <button class="preset-btn" data-preset="heart" title="Heart">&#9829;</button>
     <button class="preset-btn" data-preset="circle" title="Circle">&#9679;</button>
     <button class="preset-btn" data-preset="diamond" title="Diamond">&#9830;</button>
+    <input type="file" id="png-upload" accept="image/*" style="display:none">
+    <button class="upload-btn" id="png-btn" title="Upload your own image">&#8679; PNG</button>
   </div>
 
   <div class="canvas-wrapper">
@@ -498,6 +523,52 @@
 
   document.getElementById('snow-btn').addEventListener('click', startSnow);
   document.getElementById('back-btn').addEventListener('click', stopSnow);
+
+  // --- PNG Upload ---
+  function loadImageToCanvas(img) {
+    const maxSize = 200;
+    const scale = Math.min(maxSize / img.width, maxSize / img.height);
+    const w = img.width * scale;
+    const h = img.height * scale;
+
+    // Remove white/near-white background, convert remaining pixels to white
+    const tmpC = document.createElement('canvas');
+    tmpC.width = img.width;
+    tmpC.height = img.height;
+    const tmpX = tmpC.getContext('2d');
+    tmpX.drawImage(img, 0, 0);
+    const imageData = tmpX.getImageData(0, 0, tmpC.width, tmpC.height);
+    const d = imageData.data;
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i] > 220 && d[i+1] > 220 && d[i+2] > 220) {
+        d[i+3] = 0; // transparent
+      } else {
+        d[i] = 255; d[i+1] = 255; d[i+2] = 255; // white
+      }
+    }
+    tmpX.putImageData(imageData, 0, 0);
+
+    drawCtx.clearRect(0, 0, 220, 220);
+    drawCtx.drawImage(tmpC, (220 - w) / 2, (220 - h) / 2, w, h);
+    hasDrawn = true;
+  }
+
+  document.getElementById('png-btn').addEventListener('click', () => {
+    document.getElementById('png-upload').click();
+  });
+
+  document.getElementById('png-upload').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => loadImageToCanvas(img);
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
 })();
 </script>
 </body>
