@@ -216,7 +216,7 @@
     <span>Presets:</span>
     <button class="preset-btn" data-preset="snowflake" title="Snowflake">&#10052;</button>
     <button class="preset-btn" data-preset="heart" title="Heart">&#9829;</button>
-    <button class="preset-btn" data-preset="circle" title="Circle">&#9679;</button>
+    <button class="preset-btn" data-preset="flower" title="Flower">&#10047;</button>
     <button class="preset-btn" data-preset="diamond" title="Diamond">&#9830;</button>
     <input type="file" id="png-upload" accept="image/*" style="display:none">
     <button class="upload-btn" id="png-btn" title="Upload your own image">&#8679; PNG</button>
@@ -303,9 +303,7 @@
       const preset = btn.dataset.preset;
       if (preset === 'snowflake') drawSnowflake(cx, cy, 90);
       else if (preset === 'heart') drawHeart(cx, cy, 45);
-      else if (preset === 'circle') {
-        drawCtx.beginPath(); drawCtx.arc(cx, cy, 45, 0, Math.PI * 2); drawCtx.fill();
-      }
+      else if (preset === 'flower') drawFlower(cx, cy, 45);
       else if (preset === 'diamond') {
         drawCtx.beginPath();
         drawCtx.moveTo(cx, cy - 55);
@@ -371,6 +369,24 @@
     // Center dot
     drawCtx.beginPath();
     drawCtx.arc(cx, cy, 5, 0, Math.PI * 2);
+    drawCtx.fill();
+  }
+
+  function drawFlower(cx, cy, size) {
+    const petals = 6;
+    for (let i = 0; i < petals; i++) {
+      const angle = (Math.PI * 2 * i) / petals;
+      drawCtx.save();
+      drawCtx.translate(cx, cy);
+      drawCtx.rotate(angle);
+      drawCtx.beginPath();
+      drawCtx.ellipse(size * 0.58, 0, size * 0.52, size * 0.28, 0, 0, Math.PI * 2);
+      drawCtx.fill();
+      drawCtx.restore();
+    }
+    // Center
+    drawCtx.beginPath();
+    drawCtx.arc(cx, cy, size * 0.2, 0, Math.PI * 2);
     drawCtx.fill();
   }
 
